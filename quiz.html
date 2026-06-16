@@ -4,7 +4,65 @@
 <title>แบบทดสอบวิชาสังคมศึกษา</title>
 <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
-*{box-sizing:border-box}body{margin:0;font-family:'Sarabun',sans-serif;background:linear-gradient(180deg,#ecfdf5,#fff 45%,#ecfdf5);color:#1f2937}header{background:linear-gradient(135deg,#047857,#16a34a);color:white;text-align:center;padding:42px 18px;box-shadow:0 4px 22px rgba(0,0,0,.16)}h1{margin:0;font-size:clamp(25px,4vw,36px)}header p{margin:10px 0 0;font-size:17px}.container{max-width:980px;margin:28px auto;padding:0 16px 52px}.box,.question-card,.success-panel{background:#fff;border-radius:22px;padding:22px;margin-bottom:20px;box-shadow:0 6px 22px rgba(0,0,0,.09)}.box{border-left:8px solid #16a34a}h2{color:#047857;margin-top:0}.student-grid{display:grid;grid-template-columns:2fr 1fr 1fr;gap:14px;margin-top:18px}label{font-weight:700;color:#065f46}input{width:100%;font-family:'Sarabun';font-size:16px;padding:13px;border-radius:14px;border:1px solid #d1d5db;margin-top:6px}.buttons{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;margin:34px 0}button,a.btn{font-family:'Sarabun';border:0;padding:15px 28px;border-radius:999px;font-size:17px;font-weight:700;cursor:pointer;text-decoration:none;display:inline-block}.start-btn,.submit-btn{background:linear-gradient(135deg,#16a34a,#047857);color:#fff;box-shadow:0 8px 18px rgba(22,163,74,.28)}.reset-btn,.back-btn{background:#e5e7eb;color:#111827}#quizContainer,#quizButtons,.success-panel,#closedPanel{display:none}.question-title{font-weight:700;font-size:18px;line-height:1.65;margin-bottom:12px}.choice{display:block;padding:13px 15px;margin:9px 0;border-radius:14px;background:#f9fafb;border:1px solid #e5e7eb;cursor:pointer;line-height:1.6}.warning{display:none;color:#dc2626;text-align:center;font-weight:700}.success-panel{border-top:7px solid #16a34a;text-align:center}.success-title{font-size:28px;font-weight:700;color:#047857}.success-sub{font-size:17px;line-height:1.8;color:#374151}footer{text-align:center;padding:28px;color:#6b7280;line-height:1.8}@media(max-width:700px){.student-grid{grid-template-columns:1fr}button,a.btn{width:100%;max-width:320px;text-align:center}}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;
+  font-family:'Sarabun',sans-serif;
+  background:radial-gradient(circle at top left,rgba(22,163,74,.14),transparent 35%),linear-gradient(180deg,#ecfdf5,#fff 48%,#ecfdf5);
+  color:#1f2937;
+}
+header{
+  background:linear-gradient(135deg,#047857,#16a34a);
+  color:white;
+  text-align:center;
+  padding:38px 18px 34px;
+  box-shadow:0 4px 22px rgba(0,0,0,.16)
+}
+h1{margin:0;font-size:clamp(25px,4vw,38px);line-height:1.32;font-weight:700}
+header p{margin:10px auto 0;font-size:17px;line-height:1.65;max-width:820px;opacity:.96}
+.container{max-width:940px;margin:26px auto;padding:0 14px 52px}
+.box,.question-card,.success-panel{background:#fff;border-radius:24px;padding:22px;margin-bottom:20px;box-shadow:0 8px 28px rgba(0,0,0,.08)}
+.box{border-left:8px solid #16a34a}
+h2{color:#047857;margin:0 0 10px;font-size:24px}
+.box p{margin:0;line-height:1.8;color:#374151}
+.student-grid{display:grid;grid-template-columns:2fr 1fr 1fr;gap:14px;margin-top:18px}
+label{font-weight:700;color:#065f46}
+input{width:100%;font-family:'Sarabun';font-size:16px;padding:13px 14px;border-radius:14px;border:1px solid #d1d5db;margin-top:6px;outline:none;background:#f9fafb}
+input:focus{border-color:#16a34a;background:#fff;box-shadow:0 0 0 4px rgba(22,163,74,.12)}
+.buttons{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;margin:30px 0}
+button,a.btn{font-family:'Sarabun';border:0;padding:14px 28px;border-radius:999px;font-size:17px;font-weight:700;cursor:pointer;text-decoration:none;display:inline-block;transition:.18s}
+.start-btn,.submit-btn{background:linear-gradient(135deg,#16a34a,#047857);color:#fff;box-shadow:0 8px 20px rgba(22,163,74,.28)}
+.start-btn:hover,.submit-btn:hover{transform:translateY(-2px);box-shadow:0 12px 26px rgba(22,163,74,.36)}
+.reset-btn,.back-btn{background:#e5e7eb;color:#111827}
+#quizContainer,#quizButtons,.success-panel,#closedPanel{display:none}
+.question-card{padding:24px;border:1px solid rgba(22,163,74,.12)}
+.question-title{font-weight:700;font-size:22px;line-height:1.65;margin-bottom:18px;color:#111827}
+.choice{position:relative;display:flex;align-items:flex-start;gap:14px;padding:16px 18px;margin:12px 0;border-radius:18px;background:#f9fafb;border:1px solid #e5e7eb;cursor:pointer;line-height:1.65;font-size:18px;color:#065f46;font-weight:700;transition:.16s}
+.choice:hover{background:#ecfdf5;border-color:#34d399;transform:translateY(-1px)}
+.choice input[type="radio"]{width:22px;min-width:22px;height:22px;margin:3px 2px 0 0;accent-color:#047857;box-shadow:none;padding:0}
+.choice.checked{background:#dcfce7;border-color:#16a34a;box-shadow:0 0 0 3px rgba(22,163,74,.12)}
+.warning{display:none;color:#dc2626;text-align:center;font-weight:700;margin:16px 0;line-height:1.7}
+.success-panel{border-top:7px solid #16a34a;text-align:center}
+.success-title{font-size:30px;font-weight:700;color:#047857;line-height:1.4}
+.success-sub{font-size:17px;line-height:1.8;color:#374151;margin-top:8px}
+footer{text-align:center;padding:28px 16px 36px;color:#6b7280;line-height:1.8}
+@media(max-width:700px){
+  header{padding:32px 16px 28px}
+  header p{font-size:15.5px}
+  .container{padding:0 10px 46px;margin:18px auto}
+  .box,.question-card,.success-panel{border-radius:22px;padding:18px}
+  .student-grid{grid-template-columns:1fr}
+  h2{font-size:22px}
+  .question-title{font-size:21px;line-height:1.55}
+  .choice{font-size:18px;padding:16px 14px;border-radius:17px;gap:12px}
+  .choice input[type="radio"]{width:21px;min-width:21px;height:21px}
+  button,a.btn{width:100%;max-width:330px;text-align:center}
+}
+@media(max-width:430px){
+  .question-title{font-size:20px}
+  .choice{font-size:17px}
+}
 </style></head>
 <body>
 <header><h1 id="quizTitle">แบบทดสอบวิชาสังคมศึกษา</h1><p id="quizSubtitle">กำลังโหลดแบบทดสอบ...</p></header>
@@ -33,6 +91,18 @@ function getQuizCallback(data){
 }
 function loadQuiz(){const s=document.createElement("script");s.src=WEB_APP_URL+"?action=getQuiz&quizId="+encodeURIComponent(quizId)+"&callback=getQuizCallback&ts="+Date.now();s.onerror=function(){document.getElementById("quizSubtitle").innerHTML="โหลดแบบทดสอบไม่ได้";};document.body.appendChild(s);}
 function renderQuiz(){quizContainer.innerHTML="";questions.forEach((item,index)=>{let choicesHTML="";item.choices.forEach((choice,choiceIndex)=>{choicesHTML+=`<label class="choice"><input type="radio" name="q${index}" value="${choiceIndex}"> ${getChoiceLetter(choiceIndex)}. ${choice}</label>`;});const card=document.createElement("div");card.className="question-card";card.id=`question-${index}`;card.innerHTML=`<div class="question-title">${index+1}. ${item.question}</div>${choicesHTML}`;quizContainer.appendChild(card);});}
+
+function updateChoiceStyles(){
+  document.querySelectorAll('.choice').forEach(label=>{
+    const input=label.querySelector('input[type="radio"]');
+    if(input&&input.checked){label.classList.add('checked');}
+    else{label.classList.remove('checked');}
+  });
+}
+document.addEventListener('change',function(e){
+  if(e.target&&e.target.matches('input[type="radio"]')) updateChoiceStyles();
+});
+
 function validStudent(){return document.getElementById("studentName").value.trim()&&document.getElementById("studentRoom").value.trim()&&document.getElementById("studentNo").value.trim();}
 function warn(t,target=".box"){const w=document.getElementById("warningText");w.textContent=t;w.style.display="block";document.querySelector(target).scrollIntoView({behavior:"smooth",block:"start"});}
 function startQuiz(){if(!quiz||!quiz.open){document.getElementById("closedPanel").style.display="block";document.getElementById("startBox").style.display="none";return;}if(!validStudent()){warn("กรุณากรอกชื่อ-สกุล ห้อง และเลขที่ก่อนเริ่มทำแบบทดสอบ");return}document.getElementById("warningText").style.display="none";quizContainer.style.display="block";document.getElementById("quizButtons").style.display="flex";document.getElementById("startBox").style.display="none";setTimeout(()=>quizContainer.scrollIntoView({behavior:"smooth"}),100);}

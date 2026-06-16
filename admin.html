@@ -1,30 +1,369 @@
 <!DOCTYPE html>
-<html lang="th"><head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>จัดการแบบทดสอบ</title>
 <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
-*{box-sizing:border-box}body{margin:0;font-family:'Sarabun',sans-serif;background:linear-gradient(180deg,#ecfdf5,#fff);color:#1f2937}header{background:linear-gradient(135deg,#047857,#16a34a);color:white;text-align:center;padding:36px 18px}h1{margin:0;font-size:34px}.container{max-width:1100px;margin:28px auto;padding:0 16px 50px}.box{background:white;border-radius:22px;padding:22px;margin-bottom:20px;box-shadow:0 6px 22px rgba(0,0,0,.09);border-left:8px solid #16a34a}h2{color:#047857;margin-top:0}input,textarea,select{width:100%;font-family:'Sarabun';font-size:16px;padding:12px;border-radius:12px;border:1px solid #d1d5db;margin:6px 0 12px}textarea{min-height:80px}.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}.choice-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}button,a.btn{font-family:'Sarabun';border:0;padding:12px 18px;border-radius:999px;font-size:16px;font-weight:700;cursor:pointer;text-decoration:none;display:inline-block;margin:4px}.green{background:#047857;color:white}.red{background:#dc2626;color:white}.gray{background:#e5e7eb;color:#111827}.message{font-weight:700;margin-top:10px}table{width:100%;border-collapse:collapse;margin-top:14px}th,td{border:1px solid #e5e7eb;padding:10px;text-align:left;vertical-align:top}th{background:#f0fdf4;color:#065f46}@media(max-width:800px){.grid,.choice-grid{grid-template-columns:1fr}table{font-size:14px}}
-</style></head>
+*{box-sizing:border-box}
+body{margin:0;font-family:'Sarabun',sans-serif;background:linear-gradient(180deg,#ecfdf5,#fff);color:#1f2937}
+header{background:linear-gradient(135deg,#047857,#16a34a);color:white;text-align:center;padding:36px 18px;box-shadow:0 4px 22px rgba(0,0,0,.16)}
+h1{margin:0;font-size:34px}
+header p{margin:10px auto 0;line-height:1.7;opacity:.96}
+.container{max-width:1120px;margin:28px auto;padding:0 16px 50px}
+.box{background:white;border-radius:22px;padding:22px;margin-bottom:20px;box-shadow:0 6px 22px rgba(0,0,0,.09);border-left:8px solid #16a34a}
+h2{color:#047857;margin:0 0 12px}
+label{font-weight:700;color:#065f46}
+input,textarea,select{width:100%;font-family:'Sarabun';font-size:16px;padding:12px;border-radius:12px;border:1px solid #d1d5db;margin:6px 0 12px;background:#f9fafb}
+textarea{min-height:80px}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.grid3{display:grid;grid-template-columns:2fr 1fr 1fr;gap:12px}
+.choice-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
+button,a.btn{font-family:'Sarabun';border:0;padding:12px 18px;border-radius:999px;font-size:16px;font-weight:700;cursor:pointer;text-decoration:none;display:inline-block;margin:4px;transition:.18s}
+.green{background:#047857;color:white}
+.red{background:#dc2626;color:white}
+.gray{background:#e5e7eb;color:#111827}
+.blue{background:#2563eb;color:white}
+.message{font-weight:700;margin-top:10px;line-height:1.7}
+table{width:100%;border-collapse:collapse;margin-top:14px}
+th,td{border:1px solid #e5e7eb;padding:10px;text-align:left;vertical-align:top}
+th{background:#f0fdf4;color:#065f46}
+.small{font-size:14px;color:#6b7280;line-height:1.7}
+.preview{background:#f9fafb;border:1px dashed #94a3b8;border-radius:16px;padding:14px;margin-top:10px;white-space:pre-wrap;max-height:280px;overflow:auto}
+@media(max-width:850px){.grid,.grid3,.choice-grid{grid-template-columns:1fr}table{font-size:14px}button,a.btn{width:100%;text-align:center}}
+</style>
+</head>
 <body>
-<header><h1>ระบบจัดการข้อสอบ</h1><p>เพิ่มข้อสอบเอง / เพิ่มคำถาม / เปิด-ปิดแต่ละชุด</p></header>
+<header>
+  <h1>ระบบจัดการข้อสอบ</h1>
+  <p>เพิ่มข้อสอบเอง / นำเข้าไฟล์ / เปิด-ปิดข้อสอบแยกแต่ละชุด</p>
+</header>
+
 <main class="container">
-<section class="box"><h2>เข้าสู่ระบบผู้ดูแล</h2><label>รหัสผ่านผู้ดูแล</label><input type="password" id="adminKey" placeholder="ค่าเริ่มต้น 1234"><button class="green" onclick="loadAdminData()">โหลดข้อมูลข้อสอบ</button><a class="btn gray" href="index.html">กลับหน้าแรก</a><div id="mainMsg" class="message"></div></section>
-<section class="box"><h2>สร้างข้อสอบชุดใหม่</h2><div class="grid"><div><label>รหัสข้อสอบ เช่น history-01</label><input id="newQuizId"></div><div><label>ระดับชั้น</label><input id="newLevel" value="ม.6"></div></div><label>ชื่อข้อสอบ</label><input id="newTitle"><label>คำอธิบาย/หัวข้อย่อย</label><input id="newSubtitle"><button class="green" onclick="createQuiz()">สร้างข้อสอบ</button><div id="createMsg" class="message"></div></section>
-<section class="box"><h2>รายการข้อสอบ</h2><div id="quizTable">กรุณาโหลดข้อมูล</div></section>
-<section class="box"><h2>เพิ่มคำถามลงข้อสอบ</h2><label>เลือกชุดข้อสอบ</label><select id="questionQuizId"></select><label>คำถาม</label><textarea id="qText"></textarea><div class="choice-grid"><div><label>ก.</label><textarea id="c0"></textarea></div><div><label>ข.</label><textarea id="c1"></textarea></div><div><label>ค.</label><textarea id="c2"></textarea></div><div><label>ง.</label><textarea id="c3"></textarea></div><div><label>จ.</label><textarea id="c4"></textarea></div></div><label>เฉลย</label><select id="answer"><option value="0">ก</option><option value="1">ข</option><option value="2">ค</option><option value="3">ง</option><option value="4">จ</option></select><label>คำอธิบายเฉลย สำหรับครูดูในอีเมล/ชีต</label><textarea id="explanation"></textarea><button class="green" onclick="addQuestion()">เพิ่มคำถาม</button><div id="questionMsg" class="message"></div></section>
+  <section class="box">
+    <h2>เข้าสู่ระบบผู้ดูแล</h2>
+    <label>รหัสผ่านผู้ดูแล</label>
+    <input type="password" id="adminKey" placeholder="ค่าเริ่มต้น 1234">
+    <button class="green" onclick="loadAdminData()">โหลดข้อมูลข้อสอบ</button>
+    <a class="btn gray" href="index.html">กลับหน้าแรก</a>
+    <div id="mainMsg" class="message"></div>
+  </section>
+
+  <section class="box">
+    <h2>สร้างข้อสอบชุดใหม่</h2>
+    <div class="grid3">
+      <div>
+        <label>รหัสข้อสอบ เช่น history-01</label>
+        <input id="newQuizId" placeholder="ใช้ภาษาอังกฤษ/ตัวเลข เช่น history-01">
+      </div>
+      <div>
+        <label>ระดับชั้น</label>
+        <input id="newLevel" value="ม.6">
+      </div>
+      <div>
+        <label>สถานะเริ่มต้น</label>
+        <select id="newOpen">
+          <option value="false">ปิดไว้ก่อน</option>
+          <option value="true">เปิดทันที</option>
+        </select>
+      </div>
+    </div>
+    <label>ชื่อข้อสอบ</label>
+    <input id="newTitle" placeholder="เช่น แบบทดสอบหน่วยที่ 1 เศรษฐศาสตร์เบื้องต้น">
+    <label>คำอธิบาย/หัวข้อย่อย</label>
+    <input id="newSubtitle" placeholder="เช่น ทรัพยากร ปัญหาพื้นฐาน ระบบเศรษฐกิจ และตลาด">
+    <button class="green" onclick="createQuiz()">สร้างข้อสอบ</button>
+    <div id="createMsg" class="message"></div>
+  </section>
+
+  <section class="box">
+    <h2>รายการข้อสอบ และระบบเปิด/ปิดรายชุด</h2>
+    <p class="small">ปุ่มเปิด/ปิดในตารางนี้จะมีผลกับข้อสอบแต่ละชุดแยกกัน นักเรียนจะเข้าได้เฉพาะชุดที่เปิดอยู่</p>
+    <div id="quizTable">กรุณาโหลดข้อมูล</div>
+  </section>
+
+  <section class="box">
+    <h2>นำเข้าไฟล์คำถาม</h2>
+    <p class="small">
+      รองรับไฟล์ <b>.csv</b> และ <b>.json</b><br>
+      CSV ต้องมีหัวตาราง: question, choiceA, choiceB, choiceC, choiceD, choiceE, answer, explanation<br>
+      คอลัมน์ answer ใส่ได้ทั้ง ก/ข/ค/ง/จ, A/B/C/D/E, 1-5 หรือ 0-4
+    </p>
+
+    <div class="grid">
+      <div>
+        <label>เลือกชุดข้อสอบที่จะนำเข้า</label>
+        <select id="importQuizId"></select>
+      </div>
+      <div>
+        <label>โหมดนำเข้า</label>
+        <select id="importMode">
+          <option value="append">เพิ่มต่อจากข้อเดิม</option>
+          <option value="replace">ลบข้อเดิม แล้วนำเข้าใหม่</option>
+        </select>
+      </div>
+    </div>
+
+    <label>เลือกไฟล์ CSV หรือ JSON</label>
+    <input type="file" id="importFile" accept=".csv,.json">
+
+    <button class="blue" onclick="previewImportFile()">ตรวจไฟล์/แสดงตัวอย่าง</button>
+    <button class="green" onclick="importQuestions()">นำเข้าคำถาม</button>
+
+    <div id="importMsg" class="message"></div>
+    <div id="importPreview" class="preview">ยังไม่มีข้อมูลตัวอย่าง</div>
+  </section>
+
+  <section class="box">
+    <h2>เพิ่มคำถามทีละข้อ</h2>
+    <label>เลือกชุดข้อสอบ</label>
+    <select id="questionQuizId"></select>
+
+    <label>คำถาม</label>
+    <textarea id="qText"></textarea>
+
+    <div class="choice-grid">
+      <div><label>ก.</label><textarea id="c0"></textarea></div>
+      <div><label>ข.</label><textarea id="c1"></textarea></div>
+      <div><label>ค.</label><textarea id="c2"></textarea></div>
+      <div><label>ง.</label><textarea id="c3"></textarea></div>
+      <div><label>จ.</label><textarea id="c4"></textarea></div>
+    </div>
+
+    <label>เฉลย</label>
+    <select id="answer">
+      <option value="0">ก</option>
+      <option value="1">ข</option>
+      <option value="2">ค</option>
+      <option value="3">ง</option>
+      <option value="4">จ</option>
+    </select>
+
+    <label>คำอธิบายเฉลย สำหรับครูดูในอีเมล/ชีต</label>
+    <textarea id="explanation"></textarea>
+
+    <button class="green" onclick="addQuestion()">เพิ่มคำถาม</button>
+    <div id="questionMsg" class="message"></div>
+  </section>
 </main>
+
 <script>
 const WEB_APP_URL="https://script.google.com/macros/s/AKfycbxDoOUgSXVr0JFuGb6s6m4AnhVrH2U8xnIJZ-tkbQ_ddcDdtMy9Um0OPEQmzJMRK09V/exec";
 let quizzes=[];
+let parsedImportQuestions=[];
+
 function msg(id,t,color="#047857"){const el=document.getElementById(id);el.style.color=color;el.innerHTML=t;}
 function getKey(){return document.getElementById("adminKey").value.trim();}
-function adminListCallback(data){if(!data||data.status!=="success"){msg("mainMsg","โหลดข้อมูลไม่สำเร็จ","#dc2626");return;}quizzes=data.quizzes||[];renderQuizTable();renderQuizSelect();msg("mainMsg","โหลดข้อมูลสำเร็จ");}
-function loadAdminData(){if(!getKey()){msg("mainMsg","กรุณากรอกรหัสผ่าน","#dc2626");return;}const s=document.createElement("script");s.src=WEB_APP_URL+"?action=adminListQuizzes&key="+encodeURIComponent(getKey())+"&callback=adminListCallback&ts="+Date.now();s.onerror=()=>msg("mainMsg","ติดต่อ Apps Script ไม่ได้","#dc2626");document.body.appendChild(s);}
-function renderQuizTable(){let html='<table><tr><th>รหัส</th><th>ชื่อข้อสอบ</th><th>ระดับ</th><th>จำนวนข้อ</th><th>สถานะ</th><th>จัดการ</th></tr>';quizzes.forEach(q=>{html+=`<tr><td>${q.quizId}</td><td>${q.title}<br><small>${q.subtitle||""}</small></td><td>${q.level||""}</td><td>${q.total||0}</td><td style="color:${q.open?"#047857":"#dc2626"};font-weight:700">${q.open?"เปิด":"ปิด"}</td><td><button class="green" onclick="setStatus('${q.quizId}',true)">เปิด</button><button class="red" onclick="setStatus('${q.quizId}',false)">ปิด</button></td></tr>`;});html+='</table>';document.getElementById("quizTable").innerHTML=html;}
-function renderQuizSelect(){const sel=document.getElementById("questionQuizId");sel.innerHTML="";quizzes.forEach(q=>{const o=document.createElement("option");o.value=q.quizId;o.textContent=q.title+" ("+q.quizId+")";sel.appendChild(o);});}
-function createQuiz(){if(!getKey()){msg("createMsg","กรุณากรอกรหัสผ่านด้านบน","#dc2626");return;}const payload={action:"createQuiz",key:getKey(),quizId:document.getElementById("newQuizId").value.trim(),title:document.getElementById("newTitle").value.trim(),subtitle:document.getElementById("newSubtitle").value.trim(),level:document.getElementById("newLevel").value.trim()};if(!payload.quizId||!payload.title){msg("createMsg","กรุณากรอกรหัสข้อสอบและชื่อข้อสอบ","#dc2626");return;}fetch(WEB_APP_URL,{method:"POST",mode:"no-cors",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify(payload)});msg("createMsg","ส่งคำสั่งสร้างข้อสอบแล้ว กรุณากดโหลดข้อมูลอีกครั้ง");setTimeout(loadAdminData,1200);}
-function setStatus(quizId,open){const s=document.createElement("script");s.src=WEB_APP_URL+"?action=setQuizStatus&quizId="+encodeURIComponent(quizId)+"&open="+encodeURIComponent(open)+"&key="+encodeURIComponent(getKey())+"&callback=setStatusCallback&ts="+Date.now();document.body.appendChild(s);}
-function setStatusCallback(data){if(!data||data.status!=="success"){msg("mainMsg",(data&&data.message)||"ดำเนินการไม่สำเร็จ","#dc2626");return;}msg("mainMsg",data.message||"สำเร็จ");loadAdminData();}
-function addQuestion(){if(!getKey()){msg("questionMsg","กรุณากรอกรหัสผ่านด้านบน","#dc2626");return;}const choices=[0,1,2,3,4].map(i=>document.getElementById("c"+i).value.trim());const payload={action:"addQuestion",key:getKey(),quizId:document.getElementById("questionQuizId").value,question:document.getElementById("qText").value.trim(),choices,answer:Number(document.getElementById("answer").value),explanation:document.getElementById("explanation").value.trim()};if(!payload.quizId||!payload.question||choices.some(c=>!c)){msg("questionMsg","กรุณากรอกคำถามและตัวเลือกให้ครบ","#dc2626");return;}fetch(WEB_APP_URL,{method:"POST",mode:"no-cors",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify(payload)});msg("questionMsg","ส่งคำสั่งเพิ่มคำถามแล้ว");document.getElementById("qText").value="";[0,1,2,3,4].forEach(i=>document.getElementById("c"+i).value="");document.getElementById("explanation").value="";setTimeout(loadAdminData,1200);}
-</script></body></html>
+
+function adminListCallback(data){
+  if(!data||data.status!=="success"){msg("mainMsg",(data&&data.message)||"โหลดข้อมูลไม่สำเร็จ","#dc2626");return;}
+  quizzes=data.quizzes||[];
+  renderQuizTable();
+  renderQuizSelects();
+  msg("mainMsg","โหลดข้อมูลสำเร็จ");
+}
+
+function loadAdminData(){
+  if(!getKey()){msg("mainMsg","กรุณากรอกรหัสผ่าน","#dc2626");return;}
+  const s=document.createElement("script");
+  s.src=WEB_APP_URL+"?action=adminListQuizzes&key="+encodeURIComponent(getKey())+"&callback=adminListCallback&ts="+Date.now();
+  s.onerror=()=>msg("mainMsg","ติดต่อ Apps Script ไม่ได้","#dc2626");
+  document.body.appendChild(s);
+}
+
+function renderQuizTable(){
+  let html='<table><tr><th>รหัส</th><th>ชื่อข้อสอบ</th><th>ระดับ</th><th>จำนวนข้อ</th><th>สถานะ</th><th>จัดการ</th></tr>';
+  quizzes.forEach(q=>{
+    html+=`<tr>
+      <td>${q.quizId}</td>
+      <td><b>${q.title}</b><br><small>${q.subtitle||""}</small></td>
+      <td>${q.level||""}</td>
+      <td>${q.total||0}</td>
+      <td style="color:${q.open?"#047857":"#dc2626"};font-weight:700">${q.open?"เปิด":"ปิด"}</td>
+      <td>
+        <button class="green" onclick="setStatus('${q.quizId}',true)">เปิด</button>
+        <button class="red" onclick="setStatus('${q.quizId}',false)">ปิด</button>
+      </td>
+    </tr>`;
+  });
+  html+='</table>';
+  document.getElementById("quizTable").innerHTML=html;
+}
+
+function renderQuizSelects(){
+  ["questionQuizId","importQuizId"].forEach(id=>{
+    const sel=document.getElementById(id);
+    sel.innerHTML="";
+    quizzes.forEach(q=>{
+      const o=document.createElement("option");
+      o.value=q.quizId;
+      o.textContent=q.title+" ("+q.quizId+")";
+      sel.appendChild(o);
+    });
+  });
+}
+
+function createQuiz(){
+  if(!getKey()){msg("createMsg","กรุณากรอกรหัสผ่านด้านบน","#dc2626");return;}
+  const payload={
+    action:"createQuiz",
+    key:getKey(),
+    quizId:document.getElementById("newQuizId").value.trim(),
+    title:document.getElementById("newTitle").value.trim(),
+    subtitle:document.getElementById("newSubtitle").value.trim(),
+    level:document.getElementById("newLevel").value.trim(),
+    open:document.getElementById("newOpen").value==="true"
+  };
+  if(!payload.quizId||!payload.title){msg("createMsg","กรุณากรอกรหัสข้อสอบและชื่อข้อสอบ","#dc2626");return;}
+  fetch(WEB_APP_URL,{method:"POST",mode:"no-cors",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify(payload)});
+  msg("createMsg","ส่งคำสั่งสร้างข้อสอบแล้ว กรุณารอสักครู่");
+  setTimeout(loadAdminData,1400);
+}
+
+function setStatus(quizId,open){
+  const s=document.createElement("script");
+  s.src=WEB_APP_URL+"?action=setQuizStatus&quizId="+encodeURIComponent(quizId)+"&open="+encodeURIComponent(open)+"&key="+encodeURIComponent(getKey())+"&callback=setStatusCallback&ts="+Date.now();
+  document.body.appendChild(s);
+}
+
+function setStatusCallback(data){
+  if(!data||data.status!=="success"){msg("mainMsg",(data&&data.message)||"ดำเนินการไม่สำเร็จ","#dc2626");return;}
+  msg("mainMsg",data.message||"สำเร็จ");
+  loadAdminData();
+}
+
+function addQuestion(){
+  if(!getKey()){msg("questionMsg","กรุณากรอกรหัสผ่านด้านบน","#dc2626");return;}
+  const choices=[0,1,2,3,4].map(i=>document.getElementById("c"+i).value.trim());
+  const payload={
+    action:"addQuestion",
+    key:getKey(),
+    quizId:document.getElementById("questionQuizId").value,
+    question:document.getElementById("qText").value.trim(),
+    choices,
+    answer:Number(document.getElementById("answer").value),
+    explanation:document.getElementById("explanation").value.trim()
+  };
+  if(!payload.quizId||!payload.question||choices.some(c=>!c)){msg("questionMsg","กรุณากรอกคำถามและตัวเลือกให้ครบ","#dc2626");return;}
+  fetch(WEB_APP_URL,{method:"POST",mode:"no-cors",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify(payload)});
+  msg("questionMsg","ส่งคำสั่งเพิ่มคำถามแล้ว");
+  document.getElementById("qText").value="";
+  [0,1,2,3,4].forEach(i=>document.getElementById("c"+i).value="");
+  document.getElementById("explanation").value="";
+  setTimeout(loadAdminData,1400);
+}
+
+function normalizeAnswer(value){
+  const text=String(value??"").trim().toLowerCase();
+  const map={"ก":0,"ข":1,"ค":2,"ง":3,"จ":4,"a":0,"b":1,"c":2,"d":3,"e":4};
+  if(text in map) return map[text];
+  const n=Number(text);
+  if(Number.isInteger(n)){
+    if(n>=0&&n<=4) return n;
+    if(n>=1&&n<=5) return n-1;
+  }
+  return NaN;
+}
+
+function parseCSV(text){
+  const rows=[];
+  let row=[],cell="",inQuotes=false;
+  for(let i=0;i<text.length;i++){
+    const ch=text[i],next=text[i+1];
+    if(ch==='"'&&inQuotes&&next==='"'){cell+='"';i++;continue;}
+    if(ch==='"'){inQuotes=!inQuotes;continue;}
+    if(ch===','&&!inQuotes){row.push(cell);cell="";continue;}
+    if((ch==='\n'||ch==='\r')&&!inQuotes){
+      if(ch==='\r'&&next==='\n') i++;
+      row.push(cell);cell="";
+      if(row.some(v=>String(v).trim()!=="")) rows.push(row);
+      row=[];
+      continue;
+    }
+    cell+=ch;
+  }
+  row.push(cell);
+  if(row.some(v=>String(v).trim()!=="")) rows.push(row);
+  return rows;
+}
+
+function rowsToQuestions(rows){
+  if(rows.length<2) return [];
+  const headers=rows[0].map(h=>String(h).trim().toLowerCase());
+  const get=(row,names)=>{
+    for(const name of names){
+      const idx=headers.indexOf(name.toLowerCase());
+      if(idx>=0) return row[idx]||"";
+    }
+    return "";
+  };
+  return rows.slice(1).map(row=>{
+    const question=get(row,["question","คำถาม"]);
+    const choices=[
+      get(row,["choiceA","a","ก","ตัวเลือกก"]),
+      get(row,["choiceB","b","ข","ตัวเลือกข"]),
+      get(row,["choiceC","c","ค","ตัวเลือกค"]),
+      get(row,["choiceD","d","ง","ตัวเลือกง"]),
+      get(row,["choiceE","e","จ","ตัวเลือกจ"])
+    ];
+    const answer=normalizeAnswer(get(row,["answer","เฉลย"]));
+    const explanation=get(row,["explanation","คำอธิบาย"]);
+    return {question,choices,answer,explanation};
+  }).filter(q=>q.question&&q.choices.every(c=>c)&&Number.isInteger(q.answer)&&q.answer>=0&&q.answer<=4);
+}
+
+function normalizeJsonQuestions(raw){
+  const arr=Array.isArray(raw)?raw:(Array.isArray(raw.questions)?raw.questions:[]);
+  return arr.map(q=>{
+    const choices=q.choices||[q.choiceA,q.choiceB,q.choiceC,q.choiceD,q.choiceE];
+    return {
+      question:String(q.question||"").trim(),
+      choices:choices.map(c=>String(c||"").trim()).slice(0,5),
+      answer:normalizeAnswer(q.answer),
+      explanation:String(q.explanation||"").trim()
+    };
+  }).filter(q=>q.question&&q.choices.length===5&&q.choices.every(c=>c)&&Number.isInteger(q.answer)&&q.answer>=0&&q.answer<=4);
+}
+
+function previewImportFile(){
+  const file=document.getElementById("importFile").files[0];
+  if(!file){msg("importMsg","กรุณาเลือกไฟล์ก่อน","#dc2626");return;}
+  const reader=new FileReader();
+  reader.onload=function(){
+    try{
+      const text=reader.result;
+      if(file.name.toLowerCase().endsWith(".json")){
+        parsedImportQuestions=normalizeJsonQuestions(JSON.parse(text));
+      }else{
+        parsedImportQuestions=rowsToQuestions(parseCSV(text));
+      }
+      if(!parsedImportQuestions.length){msg("importMsg","ไม่พบคำถามที่ถูกต้องในไฟล์","#dc2626");return;}
+      msg("importMsg","ตรวจไฟล์สำเร็จ พบ "+parsedImportQuestions.length+" ข้อ");
+      const sample=parsedImportQuestions.slice(0,3).map((q,i)=>`${i+1}. ${q.question}\nก. ${q.choices[0]}\nข. ${q.choices[1]}\nค. ${q.choices[2]}\nง. ${q.choices[3]}\nจ. ${q.choices[4]}\nเฉลย: ${["ก","ข","ค","ง","จ"][q.answer]}`).join("\n\n");
+      document.getElementById("importPreview").textContent=sample;
+    }catch(err){
+      parsedImportQuestions=[];
+      msg("importMsg","อ่านไฟล์ไม่สำเร็จ: "+err.message,"#dc2626");
+    }
+  };
+  reader.readAsText(file,"utf-8");
+}
+
+function importQuestions(){
+  if(!getKey()){msg("importMsg","กรุณากรอกรหัสผ่านด้านบน","#dc2626");return;}
+  if(!parsedImportQuestions.length){msg("importMsg","กรุณากดตรวจไฟล์/แสดงตัวอย่างก่อนนำเข้า","#dc2626");return;}
+  const payload={
+    action:"importQuestions",
+    key:getKey(),
+    quizId:document.getElementById("importQuizId").value,
+    mode:document.getElementById("importMode").value,
+    questions:parsedImportQuestions
+  };
+  fetch(WEB_APP_URL,{method:"POST",mode:"no-cors",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify(payload)});
+  msg("importMsg","ส่งคำสั่งนำเข้าแล้ว จำนวน "+parsedImportQuestions.length+" ข้อ กรุณารอสักครู่");
+  setTimeout(loadAdminData,1800);
+}
+</script>
+</body>
+</html>

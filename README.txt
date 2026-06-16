@@ -1,28 +1,28 @@
-ระบบใหม่: ครูเพิ่มข้อสอบเองได้
+ระบบเพิ่มข้อสอบเอง + นำเข้าไฟล์ + เปิด/ปิดข้อสอบรายชุด
 
-ไฟล์ในชุดนี้
-1. index.html
-   - แสดงการ์ดข้อสอบทั้งหมดจาก Google Sheet
-   - แสดงเฉพาะข้อสอบที่เปิดอยู่
+เพิ่มใหม่ในเวอร์ชันนี้
+1. admin.html มีระบบนำเข้าไฟล์คำถาม
+   - รองรับ .csv
+   - รองรับ .json
+   - เลือกได้ว่าจะเพิ่มต่อจากข้อเดิม หรือแทนที่ข้อเดิมทั้งหมด
 
-2. quiz.html
-   - รับ quizId จาก URL เช่น quiz.html?quizId=economics-basic
-   - โหลดคำถามจาก Google Sheet
-   - นักเรียนไม่เห็นคะแนนและเฉลย
+2. เปิด/ปิดข้อสอบแยกแต่ละชุด
+   - ตารางรายการข้อสอบใน admin.html มีปุ่ม เปิด / ปิด แยกรายชุด
 
-3. admin.html
-   - สร้างชุดข้อสอบใหม่
-   - เพิ่มคำถามเอง
-   - เปิด/ปิดแต่ละชุดข้อสอบ
-   - รหัสผ่านเริ่มต้น: 1234
+3. มีไฟล์ตัวอย่าง
+   - template_import_questions.csv
+   - template_import_questions.json
 
-4. Code.gs
-   - Backend ทั้งหมด
-   - สร้าง Google Sheet อัตโนมัติ
-   - Seed ข้อสอบเศรษฐศาสตร์เดิมให้อัตโนมัติครั้งแรก
-   - ส่งอีเมลผลสอบให้ครู
+รูปแบบ CSV
+question, choiceA, choiceB, choiceC, choiceD, choiceE, answer, explanation
 
-ขั้นตอนใช้งาน
+ค่า answer ใส่ได้หลายแบบ
+- ก ข ค ง จ
+- A B C D E
+- 1 2 3 4 5
+- 0 1 2 3 4
+
+ขั้นตอนอัปเดต
 1. นำ Code.gs ไปวางทับใน Apps Script
 2. Save
 3. Deploy > Manage deployments > Edit
@@ -33,6 +33,5 @@
 Web App URL ที่ใส่ให้แล้ว:
 https://script.google.com/macros/s/AKfycbxDoOUgSXVr0JFuGb6s6m4AnhVrH2U8xnIJZ-tkbQ_ddcDdtMy9Um0OPEQmzJMRK09V/exec
 
-หมายเหตุ
-- หากต้องการเปลี่ยนรหัสผ่านครู ให้แก้ใน Code.gs:
-  const ADMIN_KEY = "1234";
+รหัสผ่านผู้ดูแลเริ่มต้น:
+1234
