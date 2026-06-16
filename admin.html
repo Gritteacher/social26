@@ -252,15 +252,16 @@ function deleteQuiz(quizId){
   const found = quizzes.find(q => q.quizId === quizId);
   const title = found ? found.title : quizId;
 
-  const firstConfirm = confirm("ต้องการลบแบบทดสอบนี้หรือไม่?
-
-" + title + "
-
-ระบบจะลบชุดข้อสอบ คำถาม และผลการส่งคำตอบของชุดนี้");
+  const firstConfirm = confirm(
+    "ต้องการลบแบบทดสอบนี้หรือไม่?\n\n" +
+    title +
+    "\n\nระบบจะลบชุดข้อสอบ คำถาม และผลการส่งคำตอบของชุดนี้"
+  );
   if(!firstConfirm) return;
 
-  const secondConfirm = confirm("ยืนยันอีกครั้ง: การลบนี้ไม่สามารถกู้คืนจากหน้าเว็บได้
-ต้องการลบจริงหรือไม่?");
+  const secondConfirm = confirm(
+    "ยืนยันอีกครั้ง: การลบนี้ไม่สามารถกู้คืนจากหน้าเว็บได้\nต้องการลบจริงหรือไม่?"
+  );
   if(!secondConfirm) return;
 
   const payload = {
