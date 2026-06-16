@@ -33,7 +33,7 @@ function listQuizzesCallback(data){
     const open=q.open===true;
     const card=document.createElement("article");
     card.className="quiz-card"+(open?"":" disabled-card");
-    card.innerHTML=`<div class="card-head"><div class="tag">ระดับชั้น ${q.level||"-"}</div><h3>${q.title}</h3></div><div class="card-body"><p class="desc">${q.subtitle||""}</p><div class="meta"><div>${q.total||0} ข้อ</div><div>5 ตัวเลือก</div></div><div class="status" style="color:${open?"#047857":"#dc2626"}">สถานะ: ${open?"เปิดให้ทำ":"ยังไม่เปิดให้ทำ"}</div><a class="start-button ${open?"":"disabled-button"}" href="quiz.html?quizId=${encodeURIComponent(q.quizId)}">${open?"เข้าสู่แบบทดสอบ":"ยังไม่เปิดให้ทำ"}</a></div>`;
+    card.innerHTML=`<div class="card-head"><div class="tag">ระดับชั้น ${q.level||"-"}</div><h3>${q.title}</h3></div><div class="card-body"><p class="desc">${q.subtitle||""}</p><div class="meta"><div>${q.total||0} ข้อ</div><div>5 ตัวเลือก</div></div><div class="status" style="color:${open?"#047857":"#dc2626"}">สถานะ: ${open?"Active":"Inactive"}</div><a class="start-button ${open?"":"disabled-button"}" href="quiz.html?quizId=${encodeURIComponent(q.quizId)}">${open?"เข้าสู่แบบทดสอบ":"ยังไม่เปิดให้ทำ"}</a></div>`;
     grid.appendChild(card);
   });
 }
