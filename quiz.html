@@ -128,18 +128,35 @@ const WEB_APP_URL="https://script.google.com/macros/s/AKfycbxDoOUgSXVr0JFuGb6s6m
 const params=new URLSearchParams(window.location.search);
 const quizId=params.get("quizId")||"economics-basic";
 let quiz=null,questions=[];
+
+/*
+  ตั้งค่าการสุ่มลำดับข้อสอบ
+  true  = สุ่มลำดับข้อใหม่ทุกครั้งที่เปิดทำแบบทดสอบ
+  false = เรียงตามลำดับเดิม
+*/
+const SHUFFLE_QUESTIONS = true;
 const quizContainer=document.getElementById("quizContainer");
 function getChoiceLetter(i){return ["ก","ข","ค","ง","จ"][i];}
+
+function shuffleArray(array){
+  const result = array.slice();
+  for(let i=result.length-1;i>0;i--){
+    const j = Math.floor(Math.random() * (i + 1));
+    [result[i], result[j]] = [result[j], result[i]];
+  }
+  return result;
+}
+
 function getQuizCallback(data){
  if(!data||data.status!=="success"||!data.quiz){document.getElementById("quizSubtitle").innerHTML="ไม่พบแบบทดสอบ";document.getElementById("startBox").style.display="none";return;}
- quiz=data.quiz;questions=data.questions||[];
+ quiz=data.quiz;questions=SHUFFLE_QUESTIONS ? shuffleArray(data.questions||[]) : (data.questions||[]);
  document.getElementById("quizTitle").innerHTML=quiz.title;
  document.getElementById("quizSubtitle").innerHTML=quiz.subtitle||"";
  if(!quiz.open){document.getElementById("closedPanel").style.display="block";document.getElementById("startBox").style.display="none";return;}
  renderQuiz();
 }
 function loadQuiz(){const s=document.createElement("script");s.src=WEB_APP_URL+"?action=getQuiz&quizId="+encodeURIComponent(quizId)+"&callback=getQuizCallback&ts="+Date.now();s.onerror=function(){document.getElementById("quizSubtitle").innerHTML="โหลดแบบทดสอบไม่ได้";};document.body.appendChild(s);}
-function renderQuiz(){quizContainer.innerHTML="";questions.forEach((item,index)=>{let choicesHTML="";item.choices.forEach((choice,choiceIndex)=>{choicesHTML+=`<label class="choice"><input type="radio" name="q${index}" value="${choiceIndex}"> ${getChoiceLetter(choiceIndex)}. ${choice}</label>`;});const card=document.createElement("div");card.className="question-card";card.id=`question-${index}`;card.innerHTML=`<div class="question-title">${index+1}. ${item.question}</div>${choicesHTML}`;quizContainer.appendChild(card);});}
+function renderQuiz(){quizContainer.innerHTML="";questions.forEach((item,index)=>{item.displayNumber=index+1;let choicesHTML="";item.choices.forEach((choice,choiceIndex)=>{choicesHTML+=`<label class="choice"><input type="radio" name="q${index}" value="${choiceIndex}"> ${getChoiceLetter(choiceIndex)}. ${choice}</label>`;});const card=document.createElement("div");card.className="question-card";card.id=`question-${index}`;card.innerHTML=`<div class="question-title">${index+1}. ${item.question}</div>${choicesHTML}`;quizContainer.appendChild(card);});}
 
 function updateChoiceStyles(){
   document.querySelectorAll('.choice').forEach(label=>{
@@ -155,7 +172,7 @@ document.addEventListener('change',function(e){
 function validStudent(){return document.getElementById("studentName").value.trim()&&document.getElementById("studentRoom").value.trim()&&document.getElementById("studentNo").value.trim();}
 function warn(t,target=".box"){const w=document.getElementById("warningText");w.textContent=t;w.style.display="block";document.querySelector(target).scrollIntoView({behavior:"smooth",block:"start"});}
 function startQuiz(){if(!quiz||!quiz.open){document.getElementById("closedPanel").style.display="block";document.getElementById("startBox").style.display="none";return;}if(!validStudent()){warn("กรุณากรอกชื่อ-สกุล ห้อง และเลขที่ก่อนเริ่มทำแบบทดสอบ");return}document.getElementById("warningText").style.display="none";quizContainer.style.display="block";document.getElementById("quizButtons").style.display="flex";document.getElementById("startBox").style.display="none";setTimeout(()=>quizContainer.scrollIntoView({behavior:"smooth"}),100);}
-function buildResult(){let score=0,wrongAnswers=[],allAnswers=[];questions.forEach((item,index)=>{const selected=document.querySelector(`input[name="q${index}"]:checked`);const sv=selected?Number(selected.value):null;const ok=sv===Number(item.answer);if(ok)score++;const rec={number:index+1,question:item.question,selectedLetter:sv===null?"-":getChoiceLetter(sv),selectedText:sv===null?"ไม่ได้ตอบ":item.choices[sv],correctLetter:getChoiceLetter(Number(item.answer)),correctText:item.choices[Number(item.answer)],isCorrect:ok};allAnswers.push(rec);if(!ok)wrongAnswers.push(rec);});return {quizId:quiz.quizId,quizTitle:quiz.title,score,total:questions.length,percent:((score/questions.length)*100).toFixed(2),wrongAnswers,allAnswers};}
+function buildResult(){let score=0,wrongAnswers=[],allAnswers=[];questions.forEach((item,index)=>{const selected=document.querySelector(`input[name="q${index}"]:checked`);const sv=selected?Number(selected.value):null;const ok=sv===Number(item.answer);if(ok)score++;const rec={number:index+1,originalNumber:item.number||index+1,question:item.question,selectedLetter:sv===null?"-":getChoiceLetter(sv),selectedText:sv===null?"ไม่ได้ตอบ":item.choices[sv],correctLetter:getChoiceLetter(Number(item.answer)),correctText:item.choices[Number(item.answer)],isCorrect:ok};allAnswers.push(rec);if(!ok)wrongAnswers.push(rec);});return {quizId:quiz.quizId,quizTitle:quiz.title,score,total:questions.length,percent:((score/questions.length)*100).toFixed(2),wrongAnswers,allAnswers};}
 
 function showScoreOnly(r){
   const scoreMain = document.getElementById("scoreMain");
