@@ -1,3 +1,40 @@
+อัปเดต:
+- เอาปุ่มเข้า Dashboard ออกจากหน้า index.html แล้ว
+- ยังเก็บไฟล์ dashboard.html ไว้เหมือนเดิม
+- ครูยังเข้า Dashboard ได้โดยพิมพ์ URL ตรง เช่น /dashboard.html
+
+เพิ่ม Dashboard รายห้อง
+
+ไฟล์ใหม่:
+- dashboard.html
+
+สิ่งที่เพิ่ม:
+1. หน้า dashboard.html สำหรับดูสรุปผลรายห้อง
+   - เลือกห้อง ทุกห้อง / ม.6/1 - ม.6/12
+   - แสดงจำนวนผู้ทำ
+   - คะแนนเฉลี่ย
+   - เปอร์เซ็นต์เฉลี่ย
+   - อัตราผ่าน 50%
+   - ตารางสรุปแยกห้อง
+   - ตารางสรุปแยกชุดข้อสอบ
+   - รายชื่อนักเรียนที่ส่งคำตอบ
+
+2. index.html
+   - เพิ่มปุ่ม “ดู Dashboard รายห้อง”
+
+3. quiz.html
+   - เปลี่ยนช่องห้องจากช่องพิมพ์ เป็น Dropdown ม.6/1 - ม.6/12
+
+4. Code.gs
+   - เพิ่ม action=dashboardSummary
+
+สำคัญ:
+หลังวางไฟล์แล้ว ให้นำ Code.gs ไปวางทับใน Apps Script และ Deploy เป็น New version อีกครั้ง
+
+Web App URL:
+https://script.google.com/macros/s/AKfycbxDoOUgSXVr0JFuGb6s6m4AnhVrH2U8xnIJZ-tkbQ_ddcDdtMy9Um0OPEQmzJMRK09V/exec
+
+
 ตรวจและแก้ไขไฟล์แล้ว
 
 จุดที่พบ:
