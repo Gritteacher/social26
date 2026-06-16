@@ -83,6 +83,36 @@ th{background:#f0fdf4;color:#065f46}
     <div id="quizTable">กรุณาโหลดข้อมูล</div>
   </section>
 
+
+  <section class="box" id="editQuizBox">
+    <h2>แก้ไขชื่อแบบทดสอบ</h2>
+    <p class="small">กดปุ่ม “แก้ไขชื่อ” จากตารางด้านบน เพื่อแก้ชื่อข้อสอบ คำอธิบาย และระดับชั้น โดยไม่เปลี่ยนรหัสข้อสอบเดิม</p>
+
+    <div class="grid3">
+      <div>
+        <label>รหัสข้อสอบ</label>
+        <input id="editQuizId" readonly placeholder="เลือกข้อสอบจากตารางด้านบน">
+      </div>
+      <div>
+        <label>ระดับชั้น</label>
+        <input id="editLevel" placeholder="เช่น ม.6">
+      </div>
+      <div>
+        <label>สถานะ</label>
+        <input id="editStatus" readonly>
+      </div>
+    </div>
+
+    <label>ชื่อข้อสอบใหม่</label>
+    <input id="editTitle" placeholder="ชื่อข้อสอบ">
+
+    <label>คำอธิบาย/หัวข้อย่อยใหม่</label>
+    <input id="editSubtitle" placeholder="คำอธิบาย">
+
+    <button class="green" onclick="updateQuizInfo()">บันทึกการแก้ไขชื่อ</button>
+    <div id="editMsg" class="message"></div>
+  </section>
+
   <section class="box">
     <h2>นำเข้าไฟล์คำถาม</h2>
     <p class="small">
@@ -191,6 +221,7 @@ function renderQuizTable(){
       <td style="color:${q.open?"#047857":"#dc2626"};font-weight:700">${q.open?"เปิด":"ปิด"}</td>
       <td>
         <button class="green" onclick="setStatus('${q.quizId}',true)">เปิด</button>
+        <button class="blue" onclick="startEditQuiz('${q.quizId}')">แก้ไขชื่อ</button>
         <button class="red" onclick="setStatus('${q.quizId}',false)">ปิด</button>
         <button class="gray" onclick="deleteQuiz('${q.quizId}')">ลบ</button>
       </td>
@@ -212,6 +243,62 @@ function renderQuizSelects(){
     });
   });
 }
+
+
+function startEditQuiz(quizId){
+  const q = quizzes.find(item => item.quizId === quizId);
+  if(!q){
+    msg("mainMsg","ไม่พบข้อสอบที่ต้องการแก้ไข","#dc2626");
+    return;
+  }
+
+  document.getElementById("editQuizId").value = q.quizId || "";
+  document.getElementById("editTitle").value = q.title || "";
+  document.getElementById("editSubtitle").value = q.subtitle || "";
+  document.getElementById("editLevel").value = q.level || "";
+  document.getElementById("editStatus").value = q.open ? "เปิด" : "ปิด";
+  msg("editMsg","พร้อมแก้ไขชื่อแบบทดสอบ: " + (q.title || q.quizId));
+
+  const box = document.getElementById("editQuizBox");
+  if(box) box.scrollIntoView({behavior:"smooth", block:"start"});
+}
+
+function updateQuizInfo(){
+  if(!getKey()){
+    msg("editMsg","กรุณากรอกรหัสผ่านด้านบน","#dc2626");
+    return;
+  }
+
+  const payload = {
+    action: "updateQuiz",
+    key: getKey(),
+    quizId: document.getElementById("editQuizId").value.trim(),
+    title: document.getElementById("editTitle").value.trim(),
+    subtitle: document.getElementById("editSubtitle").value.trim(),
+    level: document.getElementById("editLevel").value.trim()
+  };
+
+  if(!payload.quizId){
+    msg("editMsg","กรุณาเลือกข้อสอบจากตารางด้านบนก่อน","#dc2626");
+    return;
+  }
+
+  if(!payload.title){
+    msg("editMsg","กรุณากรอกชื่อข้อสอบ","#dc2626");
+    return;
+  }
+
+  fetch(WEB_APP_URL,{
+    method:"POST",
+    mode:"no-cors",
+    headers:{"Content-Type":"text/plain;charset=utf-8"},
+    body:JSON.stringify(payload)
+  });
+
+  msg("editMsg","ส่งคำสั่งแก้ไขชื่อแล้ว กรุณารอสักครู่");
+  setTimeout(loadAdminData,1400);
+}
+
 
 function createQuiz(){
   if(!getKey()){msg("createMsg","กรุณากรอกรหัสผ่านด้านบน","#dc2626");return;}
