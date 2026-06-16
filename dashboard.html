@@ -88,9 +88,64 @@ tr:nth-child(even) td{background:#fafafa}
   .cards{grid-template-columns:1fr}
   .card .value{font-size:30px}
 }
+
+/* Loading Popup */
+.loading-overlay{
+  position:fixed;
+  inset:0;
+  z-index:99999;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+  background:rgba(17,24,39,.46);
+  backdrop-filter:blur(5px);
+}
+.loading-overlay.show{display:flex}
+.loading-box{
+  width:min(360px,92vw);
+  background:white;
+  border-radius:26px;
+  padding:28px 24px;
+  text-align:center;
+  box-shadow:0 18px 60px rgba(0,0,0,.28);
+  border-top:8px solid #16a34a;
+}
+.loading-spinner{
+  width:54px;
+  height:54px;
+  margin:0 auto 16px;
+  border-radius:50%;
+  border:6px solid #dcfce7;
+  border-top-color:#047857;
+  animation:loadingSpin .85s linear infinite;
+}
+.loading-title{
+  font-size:22px;
+  font-weight:700;
+  color:#047857;
+  line-height:1.5;
+}
+.loading-sub{
+  margin-top:6px;
+  color:#6b7280;
+  font-size:15px;
+  line-height:1.6;
+}
+@keyframes loadingSpin{to{transform:rotate(360deg)}}
+
 </style>
 </head>
 <body>
+
+<div id="loadingOverlay" class="loading-overlay" aria-live="polite" aria-busy="true">
+  <div class="loading-box">
+    <div class="loading-spinner"></div>
+    <div class="loading-title" id="loadingText">กำลังโหลดข้อมูล...</div>
+    <div class="loading-sub">กรุณารอสักครู่</div>
+  </div>
+</div>
+
 <header>
   <h1>Dashboard สรุปผลแบบทดสอบรายห้อง</h1>
   <p>เลือกห้อง ม.6/1–ม.6/12 เพื่อดูจำนวนผู้ทำ คะแนนเฉลี่ย อัตราผ่าน และรายชื่อนักเรียน</p>
@@ -153,6 +208,19 @@ tr:nth-child(even) td{background:#fafafa}
 </main>
 
 <script>
+
+function showLoading(text="กำลังโหลดข้อมูล..."){
+  const overlay=document.getElementById("loadingOverlay");
+  const loadingText=document.getElementById("loadingText");
+  if(loadingText) loadingText.textContent=text;
+  if(overlay) overlay.classList.add("show");
+}
+function hideLoading(){
+  const overlay=document.getElementById("loadingOverlay");
+  if(overlay) overlay.classList.remove("show");
+}
+
+
 const WEB_APP_URL="https://script.google.com/macros/s/AKfycbxDoOUgSXVr0JFuGb6s6m4AnhVrH2U8xnIJZ-tkbQ_ddcDdtMy9Um0OPEQmzJMRK09V/exec";
 function msg(text,color="#047857"){
   const el=document.getElementById("message");
@@ -161,6 +229,7 @@ function msg(text,color="#047857"){
 }
 
 function dashboardCallback(data){
+  hideLoading();
   window.__dashboardLoaded=true;
   if(!data||data.status!=="success"){
     msg((data&&data.message)||"โหลดข้อมูลไม่สำเร็จ","#dc2626");
@@ -175,13 +244,15 @@ function loadDashboard(){
   const room=document.getElementById("roomSelect").value;
   if(!key){msg("กรุณากรอกรหัสผ่านผู้ดูแล","#dc2626");return;}
   msg("กำลังโหลดข้อมูล...");
+  showLoading("กำลังโหลดข้อมูล Dashboard...");
   window.__dashboardLoaded=false;
   const s=document.createElement("script");
   s.src=WEB_APP_URL+"?action=dashboardSummary&key="+encodeURIComponent(key)+"&room="+encodeURIComponent(room)+"&callback=dashboardCallback&ts="+Date.now();
-  s.onerror=function(){msg("ติดต่อ Apps Script ไม่ได้ กรุณาตรวจสอบการ Deploy","#dc2626");};
+  s.onerror=function(){hideLoading();msg("ติดต่อ Apps Script ไม่ได้ กรุณาตรวจสอบการ Deploy","#dc2626");};
   document.body.appendChild(s);
   setTimeout(function(){
     if(!window.__dashboardLoaded){
+      hideLoading();
       msg("โหลดข้อมูลไม่สำเร็จ กรุณาวาง Code.gs เวอร์ชันล่าสุด แล้ว Deploy เป็น New version","#dc2626");
     }
   },7000);

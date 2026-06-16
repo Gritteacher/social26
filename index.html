@@ -6,9 +6,64 @@
 <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box}body{margin:0;font-family:'Sarabun',sans-serif;background:linear-gradient(180deg,#ecfdf5,#fff 52%,#ecfdf5);color:#1f2937;min-height:100vh}header{background:linear-gradient(135deg,#047857,#16a34a);color:white;text-align:center;padding:46px 18px 40px;box-shadow:0 4px 22px rgba(0,0,0,.16)}.badge{display:inline-block;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.34);padding:8px 18px;border-radius:999px;font-weight:700;margin-bottom:16px}h1{margin:0;font-size:clamp(30px,5vw,48px)}header p{margin:14px auto 0;max-width:760px;font-size:clamp(16px,2.2vw,20px);line-height:1.7}.container{max-width:1120px;margin:32px auto;padding:0 18px 48px}.topbar{background:white;border-radius:24px;padding:20px 22px;box-shadow:0 8px 26px rgba(0,0,0,.08);margin-bottom:22px;border-left:8px solid #16a34a;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}.topbar h2{margin:0;color:#047857;font-size:24px}.topbar p{margin:4px 0 0;color:#4b5563;line-height:1.6}.quiz-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}.quiz-card{background:#fff;border-radius:26px;overflow:hidden;box-shadow:0 10px 30px rgba(0,0,0,.1);border:1px solid rgba(22,163,74,.16);display:flex;flex-direction:column;min-height:340px}.card-head{background:linear-gradient(135deg,#047857,#16a34a);color:white;padding:24px 22px}.tag{display:inline-block;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.28);padding:5px 12px;border-radius:999px;font-size:13px;font-weight:700;margin-bottom:12px}.card-head h3{margin:0;font-size:24px;line-height:1.35}.card-body{padding:22px;flex:1;display:flex;flex-direction:column}.desc{color:#374151;line-height:1.7;margin:0 0 18px;flex:1}.meta{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:18px}.meta div{background:#f0fdf4;border:1px solid #bbf7d0;border-radius:14px;padding:10px;text-align:center;color:#065f46;font-weight:700;font-size:14px}.status{font-weight:700;margin-bottom:14px;color:#047857;min-height:24px}.start-button{display:block;text-align:center;text-decoration:none;background:linear-gradient(135deg,#16a34a,#047857);color:white;padding:14px 20px;border-radius:999px;font-size:17px;font-weight:700;box-shadow:0 8px 18px rgba(22,163,74,.25)}.disabled-button{pointer-events:none;background:#9ca3af;box-shadow:none}.disabled-card{opacity:.7}footer{text-align:center;color:#6b7280;line-height:1.8;padding:10px 18px 38px}@media(max-width:960px){.quiz-grid{grid-template-columns:repeat(2,1fr)}}@media(max-width:640px){.quiz-grid{grid-template-columns:1fr}}
+
+/* Loading Popup */
+.loading-overlay{
+  position:fixed;
+  inset:0;
+  z-index:99999;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+  background:rgba(17,24,39,.46);
+  backdrop-filter:blur(5px);
+}
+.loading-overlay.show{display:flex}
+.loading-box{
+  width:min(360px,92vw);
+  background:white;
+  border-radius:26px;
+  padding:28px 24px;
+  text-align:center;
+  box-shadow:0 18px 60px rgba(0,0,0,.28);
+  border-top:8px solid #16a34a;
+}
+.loading-spinner{
+  width:54px;
+  height:54px;
+  margin:0 auto 16px;
+  border-radius:50%;
+  border:6px solid #dcfce7;
+  border-top-color:#047857;
+  animation:loadingSpin .85s linear infinite;
+}
+.loading-title{
+  font-size:22px;
+  font-weight:700;
+  color:#047857;
+  line-height:1.5;
+}
+.loading-sub{
+  margin-top:6px;
+  color:#6b7280;
+  font-size:15px;
+  line-height:1.6;
+}
+@keyframes loadingSpin{to{transform:rotate(360deg)}}
+
 </style>
 </head>
 <body>
+
+<div id="loadingOverlay" class="loading-overlay" aria-live="polite" aria-busy="true">
+  <div class="loading-box">
+    <div class="loading-spinner"></div>
+    <div class="loading-title" id="loadingText">กำลังโหลดข้อมูล...</div>
+    <div class="loading-sub">กรุณารอสักครู่</div>
+  </div>
+</div>
+
 <header><div class="badge">ระบบทดสอบออนไลน์</div><h1>คลังแบบทดสอบวิชาสังคมศึกษา</h1><p>ครูไต๋ กฤษณพล ทองอุ่น</p></header>
 <main class="container">
   <section class="topbar">
@@ -21,9 +76,23 @@
 </main>
 <footer>จัดทำเพื่อใช้ประกอบการเรียนการสอนรายวิชาสังคมศึกษา<br>โดย ครูกฤษณพล ทองอุ่น<br>โรงเรียนเทพศิรินทร์ นนทบุรี</footer>
 <script>
+
+function showLoading(text="กำลังโหลดข้อมูล..."){
+  const overlay=document.getElementById("loadingOverlay");
+  const loadingText=document.getElementById("loadingText");
+  if(loadingText) loadingText.textContent=text;
+  if(overlay) overlay.classList.add("show");
+}
+function hideLoading(){
+  const overlay=document.getElementById("loadingOverlay");
+  if(overlay) overlay.classList.remove("show");
+}
+
+
 const WEB_APP_URL="https://script.google.com/macros/s/AKfycbxDoOUgSXVr0JFuGb6s6m4AnhVrH2U8xnIJZ-tkbQ_ddcDdtMy9Um0OPEQmzJMRK09V/exec";
-function renderError(){document.getElementById("quizGrid").innerHTML='<article class="quiz-card"><div class="card-body"><p class="desc" style="color:#dc2626;font-weight:700;">โหลดรายการแบบทดสอบไม่ได้ กรุณาตรวจสอบ Apps Script</p></div></article>';}
+function renderError(){hideLoading();document.getElementById("quizGrid").innerHTML='<article class="quiz-card"><div class="card-body"><p class="desc" style="color:#dc2626;font-weight:700;">โหลดรายการแบบทดสอบไม่ได้ กรุณาตรวจสอบ Apps Script</p></div></article>';}
 function listQuizzesCallback(data){
+  hideLoading();
   const grid=document.getElementById("quizGrid");
   if(!data||data.status!=="success"){renderError();return;}
   const quizzes=data.quizzes||[];
@@ -38,6 +107,7 @@ function listQuizzesCallback(data){
   });
 }
 function loadQuizzes(){
+  showLoading("กำลังโหลดรายการแบบทดสอบ...");
   const s=document.createElement("script");
   s.src=WEB_APP_URL+"?action=listQuizzes&callback=listQuizzesCallback&ts="+Date.now();
   s.onerror=renderError;

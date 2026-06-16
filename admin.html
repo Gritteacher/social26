@@ -32,9 +32,64 @@ th{background:#f0fdf4;color:#065f46}
 .small{font-size:14px;color:#6b7280;line-height:1.7}
 .preview{background:#f9fafb;border:1px dashed #94a3b8;border-radius:16px;padding:14px;margin-top:10px;white-space:pre-wrap;max-height:280px;overflow:auto}
 @media(max-width:850px){.grid,.grid3,.choice-grid{grid-template-columns:1fr}table{font-size:14px}button,a.btn{width:100%;text-align:center}}
+
+/* Loading Popup */
+.loading-overlay{
+  position:fixed;
+  inset:0;
+  z-index:99999;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+  background:rgba(17,24,39,.46);
+  backdrop-filter:blur(5px);
+}
+.loading-overlay.show{display:flex}
+.loading-box{
+  width:min(360px,92vw);
+  background:white;
+  border-radius:26px;
+  padding:28px 24px;
+  text-align:center;
+  box-shadow:0 18px 60px rgba(0,0,0,.28);
+  border-top:8px solid #16a34a;
+}
+.loading-spinner{
+  width:54px;
+  height:54px;
+  margin:0 auto 16px;
+  border-radius:50%;
+  border:6px solid #dcfce7;
+  border-top-color:#047857;
+  animation:loadingSpin .85s linear infinite;
+}
+.loading-title{
+  font-size:22px;
+  font-weight:700;
+  color:#047857;
+  line-height:1.5;
+}
+.loading-sub{
+  margin-top:6px;
+  color:#6b7280;
+  font-size:15px;
+  line-height:1.6;
+}
+@keyframes loadingSpin{to{transform:rotate(360deg)}}
+
 </style>
 </head>
 <body>
+
+<div id="loadingOverlay" class="loading-overlay" aria-live="polite" aria-busy="true">
+  <div class="loading-box">
+    <div class="loading-spinner"></div>
+    <div class="loading-title" id="loadingText">กำลังโหลดข้อมูล...</div>
+    <div class="loading-sub">กรุณารอสักครู่</div>
+  </div>
+</div>
+
 <header>
   <h1>ระบบจัดการข้อสอบ</h1>
   <p>เพิ่มข้อสอบเอง / นำเข้าไฟล์ / เปิด-ปิดข้อสอบแยกแต่ละชุด</p>
@@ -179,6 +234,19 @@ th{background:#f0fdf4;color:#065f46}
 </main>
 
 <script>
+
+function showLoading(text="กำลังโหลดข้อมูล..."){
+  const overlay=document.getElementById("loadingOverlay");
+  const loadingText=document.getElementById("loadingText");
+  if(loadingText) loadingText.textContent=text;
+  if(overlay) overlay.classList.add("show");
+}
+function hideLoading(){
+  const overlay=document.getElementById("loadingOverlay");
+  if(overlay) overlay.classList.remove("show");
+}
+
+
 const WEB_APP_URL="https://script.google.com/macros/s/AKfycbxDoOUgSXVr0JFuGb6s6m4AnhVrH2U8xnIJZ-tkbQ_ddcDdtMy9Um0OPEQmzJMRK09V/exec";
 let quizzes=[];
 let parsedImportQuestions=[];
@@ -187,6 +255,7 @@ function msg(id,t,color="#047857"){const el=document.getElementById(id);el.style
 function getKey(){return document.getElementById("adminKey").value.trim();}
 
 function adminListCallback(data){
+  hideLoading();
   window.__adminLoaded = true;
   if(!data||data.status!=="success"){msg("mainMsg",(data&&data.message)||"โหลดข้อมูลไม่สำเร็จ","#dc2626");return;}
   quizzes=data.quizzes||[];
@@ -198,13 +267,15 @@ function adminListCallback(data){
 function loadAdminData(){
   if(!getKey()){msg("mainMsg","กรุณากรอกรหัสผ่าน","#dc2626");return;}
   msg("mainMsg","กำลังโหลดข้อมูล...");
+  showLoading("กำลังโหลดข้อมูลข้อสอบ...");
   window.__adminLoaded = false;
   const s=document.createElement("script");
   s.src=WEB_APP_URL+"?action=adminListQuizzes&key="+encodeURIComponent(getKey())+"&callback=adminListCallback&ts="+Date.now();
-  s.onerror=()=>msg("mainMsg","ติดต่อ Apps Script ไม่ได้ กรุณาตรวจสอบ Web App URL และการ Deploy","#dc2626");
+  s.onerror=()=>{hideLoading();msg("mainMsg","ติดต่อ Apps Script ไม่ได้ กรุณาตรวจสอบ Web App URL และการ Deploy","#dc2626");};
   document.body.appendChild(s);
   setTimeout(()=>{
     if(!window.__adminLoaded){
+      hideLoading();
       msg("mainMsg","โหลดข้อมูลไม่สำเร็จ กรุณาวาง Code.gs เวอร์ชันล่าสุด แล้ว Deploy เป็น New version","#dc2626");
     }
   },7000);
@@ -288,6 +359,7 @@ function updateQuizInfo(){
     return;
   }
 
+  showLoading("กำลังบันทึกการแก้ไข...");
   fetch(WEB_APP_URL,{
     method:"POST",
     mode:"no-cors",
@@ -312,18 +384,21 @@ function createQuiz(){
     open:document.getElementById("newOpen").value==="true"
   };
   if(!payload.quizId||!payload.title){msg("createMsg","กรุณากรอกรหัสข้อสอบและชื่อข้อสอบ","#dc2626");return;}
+  showLoading("กำลังสร้างข้อสอบ...");
   fetch(WEB_APP_URL,{method:"POST",mode:"no-cors",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify(payload)});
   msg("createMsg","ส่งคำสั่งสร้างข้อสอบแล้ว กรุณารอสักครู่");
   setTimeout(loadAdminData,1400);
 }
 
 function setStatus(quizId,open){
+  showLoading(open ? "กำลังเปิดแบบทดสอบ..." : "กำลังปิดแบบทดสอบ...");
   const s=document.createElement("script");
   s.src=WEB_APP_URL+"?action=setQuizStatus&quizId="+encodeURIComponent(quizId)+"&open="+encodeURIComponent(open)+"&key="+encodeURIComponent(getKey())+"&callback=setStatusCallback&ts="+Date.now();
   document.body.appendChild(s);
 }
 
 function setStatusCallback(data){
+  hideLoading();
   if(!data||data.status!=="success"){msg("mainMsg",(data&&data.message)||"ดำเนินการไม่สำเร็จ","#dc2626");return;}
   msg("mainMsg",data.message||"สำเร็จ");
   loadAdminData();
@@ -357,6 +432,7 @@ function deleteQuiz(quizId){
     quizId: quizId
   };
 
+  showLoading("กำลังลบแบบทดสอบ...");
   fetch(WEB_APP_URL,{
     method:"POST",
     mode:"no-cors",
@@ -381,6 +457,7 @@ function addQuestion(){
     explanation:document.getElementById("explanation").value.trim()
   };
   if(!payload.quizId||!payload.question||choices.some(c=>!c)){msg("questionMsg","กรุณากรอกคำถามและตัวเลือกให้ครบ","#dc2626");return;}
+  showLoading("กำลังเพิ่มคำถาม...");
   fetch(WEB_APP_URL,{method:"POST",mode:"no-cors",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify(payload)});
   msg("questionMsg","ส่งคำสั่งเพิ่มคำถามแล้ว");
   document.getElementById("qText").value="";
@@ -464,6 +541,7 @@ function normalizeJsonQuestions(raw){
 function previewImportFile(){
   const file=document.getElementById("importFile").files[0];
   if(!file){msg("importMsg","กรุณาเลือกไฟล์ก่อน","#dc2626");return;}
+  showLoading("กำลังอ่านไฟล์...");
   const reader=new FileReader();
   reader.onload=function(){
     try{
@@ -473,12 +551,14 @@ function previewImportFile(){
       }else{
         parsedImportQuestions=rowsToQuestions(parseCSV(text));
       }
-      if(!parsedImportQuestions.length){msg("importMsg","ไม่พบคำถามที่ถูกต้องในไฟล์","#dc2626");return;}
+      if(!parsedImportQuestions.length){hideLoading();msg("importMsg","ไม่พบคำถามที่ถูกต้องในไฟล์","#dc2626");return;}
       msg("importMsg","ตรวจไฟล์สำเร็จ พบ "+parsedImportQuestions.length+" ข้อ");
       const sample=parsedImportQuestions.slice(0,3).map((q,i)=>`${i+1}. ${q.question}\nก. ${q.choices[0]}\nข. ${q.choices[1]}\nค. ${q.choices[2]}\nง. ${q.choices[3]}\nจ. ${q.choices[4]}\nเฉลย: ${["ก","ข","ค","ง","จ"][q.answer]}`).join("\n\n");
       document.getElementById("importPreview").textContent=sample;
+      hideLoading();
     }catch(err){
       parsedImportQuestions=[];
+      hideLoading();
       msg("importMsg","อ่านไฟล์ไม่สำเร็จ: "+err.message,"#dc2626");
     }
   };
@@ -495,6 +575,7 @@ function importQuestions(){
     mode:document.getElementById("importMode").value,
     questions:parsedImportQuestions
   };
+  showLoading("กำลังนำเข้าคำถาม...");
   fetch(WEB_APP_URL,{method:"POST",mode:"no-cors",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify(payload)});
   msg("importMsg","ส่งคำสั่งนำเข้าแล้ว จำนวน "+parsedImportQuestions.length+" ข้อ กรุณารอสักครู่");
   setTimeout(loadAdminData,1800);
