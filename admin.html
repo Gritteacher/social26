@@ -157,6 +157,7 @@ function msg(id,t,color="#047857"){const el=document.getElementById(id);el.style
 function getKey(){return document.getElementById("adminKey").value.trim();}
 
 function adminListCallback(data){
+  window.__adminLoaded = true;
   if(!data||data.status!=="success"){msg("mainMsg",(data&&data.message)||"โหลดข้อมูลไม่สำเร็จ","#dc2626");return;}
   quizzes=data.quizzes||[];
   renderQuizTable();
@@ -166,10 +167,17 @@ function adminListCallback(data){
 
 function loadAdminData(){
   if(!getKey()){msg("mainMsg","กรุณากรอกรหัสผ่าน","#dc2626");return;}
+  msg("mainMsg","กำลังโหลดข้อมูล...");
+  window.__adminLoaded = false;
   const s=document.createElement("script");
   s.src=WEB_APP_URL+"?action=adminListQuizzes&key="+encodeURIComponent(getKey())+"&callback=adminListCallback&ts="+Date.now();
-  s.onerror=()=>msg("mainMsg","ติดต่อ Apps Script ไม่ได้","#dc2626");
+  s.onerror=()=>msg("mainMsg","ติดต่อ Apps Script ไม่ได้ กรุณาตรวจสอบ Web App URL และการ Deploy","#dc2626");
   document.body.appendChild(s);
+  setTimeout(()=>{
+    if(!window.__adminLoaded){
+      msg("mainMsg","โหลดข้อมูลไม่สำเร็จ กรุณาวาง Code.gs เวอร์ชันล่าสุด แล้ว Deploy เป็น New version","#dc2626");
+    }
+  },7000);
 }
 
 function renderQuizTable(){
@@ -184,7 +192,7 @@ function renderQuizTable(){
       <td>
         <button class="green" onclick="setStatus('${q.quizId}',true)">เปิด</button>
         <button class="red" onclick="setStatus('${q.quizId}',false)">ปิด</button>
-        <button class="gray" onclick="deleteQuiz('${q.quizId}', '${String(q.title || '').replace(/'/g, '\\'')}')">ลบ</button>
+        <button class="gray" onclick="deleteQuiz('${q.quizId}')">ลบ</button>
       </td>
     </tr>`;
   });
@@ -235,16 +243,24 @@ function setStatusCallback(data){
 }
 
 
-function deleteQuiz(quizId,title){
+function deleteQuiz(quizId){
   if(!getKey()){
     msg("mainMsg","กรุณากรอกรหัสผ่านก่อนลบแบบทดสอบ","#dc2626");
     return;
   }
 
-  const firstConfirm = confirm("ต้องการลบแบบทดสอบนี้หรือไม่?\\n\\n" + title + "\\n\\nระบบจะลบชุดข้อสอบ คำถาม และผลการส่งคำตอบของชุดนี้");
+  const found = quizzes.find(q => q.quizId === quizId);
+  const title = found ? found.title : quizId;
+
+  const firstConfirm = confirm("ต้องการลบแบบทดสอบนี้หรือไม่?
+
+" + title + "
+
+ระบบจะลบชุดข้อสอบ คำถาม และผลการส่งคำตอบของชุดนี้");
   if(!firstConfirm) return;
 
-  const secondConfirm = confirm("ยืนยันอีกครั้ง: การลบนี้ไม่สามารถกู้คืนจากหน้าเว็บได้\\nต้องการลบจริงหรือไม่?");
+  const secondConfirm = confirm("ยืนยันอีกครั้ง: การลบนี้ไม่สามารถกู้คืนจากหน้าเว็บได้
+ต้องการลบจริงหรือไม่?");
   if(!secondConfirm) return;
 
   const payload = {
