@@ -1,50 +1,22 @@
-อัปเดตเพิ่มเติม: ระบบลบแบบทดสอบ
+ตรวจและแก้ไขไฟล์แล้ว
 
-เพิ่มใน admin.html:
-- ปุ่ม “ลบ” ในตารางรายการข้อสอบ
-- ระบบถามยืนยัน 2 ครั้งก่อนลบ
-- เมื่อลบ จะลบข้อมูล 3 ส่วน:
-  1. ชุดแบบทดสอบในชีต Quizzes
-  2. คำถามทั้งหมดของชุดนั้นในชีต Questions
-  3. ผลการส่งคำตอบของชุดนั้นในชีต Submissions
+จุดที่พบ:
+1. admin.html มี JavaScript SyntaxError ในฟังก์ชัน deleteQuiz()
+   สาเหตุคือข้อความ confirm มีการขึ้นบรรทัดใหม่จริงอยู่ในเครื่องหมายคำพูด "..."
+   ทำให้สคริปต์ทั้งหน้าไม่ทำงาน และปุ่มโหลดข้อมูลข้อสอบใช้งานไม่ได้
 
-หลังวางทับไฟล์แล้ว ต้องนำ Code.gs ไป Deploy เป็น New version อีกครั้ง
+สิ่งที่แก้:
+- แก้ confirm ใน deleteQuiz() ให้ใช้ \n แทนการขึ้นบรรทัดใหม่จริง
+- ตรวจ Syntax ของ JavaScript ใน admin.html, index.html, quiz.html แล้วผ่าน
+- ตรวจ Syntax ของ Code.gs แล้วผ่าน
+- คงระบบเดิมครบ: เพิ่มข้อสอบ, นำเข้า CSV/JSON, เปิด/ปิดรายชุด, ลบข้อสอบ
 
+วิธีใช้งาน:
+1. อัปโหลด index.html, quiz.html, admin.html ไปวางทับไฟล์เดิม
+2. นำ Code.gs ไปวางทับใน Apps Script
+3. กด Save
+4. Deploy > Manage deployments > Edit
+5. เลือก New version
+6. กด Deploy
 
-ระบบเพิ่มข้อสอบเอง + นำเข้าไฟล์ + เปิด/ปิดข้อสอบรายชุด
-
-เพิ่มใหม่ในเวอร์ชันนี้
-1. admin.html มีระบบนำเข้าไฟล์คำถาม
-   - รองรับ .csv
-   - รองรับ .json
-   - เลือกได้ว่าจะเพิ่มต่อจากข้อเดิม หรือแทนที่ข้อเดิมทั้งหมด
-
-2. เปิด/ปิดข้อสอบแยกแต่ละชุด
-   - ตารางรายการข้อสอบใน admin.html มีปุ่ม เปิด / ปิด แยกรายชุด
-
-3. มีไฟล์ตัวอย่าง
-   - template_import_questions.csv
-   - template_import_questions.json
-
-รูปแบบ CSV
-question, choiceA, choiceB, choiceC, choiceD, choiceE, answer, explanation
-
-ค่า answer ใส่ได้หลายแบบ
-- ก ข ค ง จ
-- A B C D E
-- 1 2 3 4 5
-- 0 1 2 3 4
-
-ขั้นตอนอัปเดต
-1. นำ Code.gs ไปวางทับใน Apps Script
-2. Save
-3. Deploy > Manage deployments > Edit
-4. Version เลือก New version
-5. Deploy
-6. อัปโหลด index.html, quiz.html, admin.html ไปวางทับเว็บเดิม
-
-Web App URL ที่ใส่ให้แล้ว:
-https://script.google.com/macros/s/AKfycbxDoOUgSXVr0JFuGb6s6m4AnhVrH2U8xnIJZ-tkbQ_ddcDdtMy9Um0OPEQmzJMRK09V/exec
-
-รหัสผ่านผู้ดูแลเริ่มต้น:
-1234
+รหัสผ่านผู้ดูแลเริ่มต้น: 1234
