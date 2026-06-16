@@ -79,7 +79,7 @@ th{background:#f0fdf4;color:#065f46}
 
   <section class="box">
     <h2>รายการข้อสอบ และระบบเปิด/ปิดรายชุด</h2>
-    <p class="small">ปุ่มเปิด/ปิดในตารางนี้จะมีผลกับข้อสอบแต่ละชุดแยกกัน นักเรียนจะเข้าได้เฉพาะชุดที่เปิดอยู่</p>
+    <p class="small">ปุ่มเปิด/ปิดในตารางนี้จะมีผลกับข้อสอบแต่ละชุดแยกกัน นักเรียนจะเข้าได้เฉพาะชุดที่เปิดอยู่ และสามารถลบแบบทดสอบเป็นรายชุดได้</p>
     <div id="quizTable">กรุณาโหลดข้อมูล</div>
   </section>
 
@@ -184,6 +184,7 @@ function renderQuizTable(){
       <td>
         <button class="green" onclick="setStatus('${q.quizId}',true)">เปิด</button>
         <button class="red" onclick="setStatus('${q.quizId}',false)">ปิด</button>
+        <button class="gray" onclick="deleteQuiz('${q.quizId}', '${String(q.title || '').replace(/'/g, '\\'')}')">ลบ</button>
       </td>
     </tr>`;
   });
@@ -231,6 +232,36 @@ function setStatusCallback(data){
   if(!data||data.status!=="success"){msg("mainMsg",(data&&data.message)||"ดำเนินการไม่สำเร็จ","#dc2626");return;}
   msg("mainMsg",data.message||"สำเร็จ");
   loadAdminData();
+}
+
+
+function deleteQuiz(quizId,title){
+  if(!getKey()){
+    msg("mainMsg","กรุณากรอกรหัสผ่านก่อนลบแบบทดสอบ","#dc2626");
+    return;
+  }
+
+  const firstConfirm = confirm("ต้องการลบแบบทดสอบนี้หรือไม่?\\n\\n" + title + "\\n\\nระบบจะลบชุดข้อสอบ คำถาม และผลการส่งคำตอบของชุดนี้");
+  if(!firstConfirm) return;
+
+  const secondConfirm = confirm("ยืนยันอีกครั้ง: การลบนี้ไม่สามารถกู้คืนจากหน้าเว็บได้\\nต้องการลบจริงหรือไม่?");
+  if(!secondConfirm) return;
+
+  const payload = {
+    action: "deleteQuiz",
+    key: getKey(),
+    quizId: quizId
+  };
+
+  fetch(WEB_APP_URL,{
+    method:"POST",
+    mode:"no-cors",
+    headers:{"Content-Type":"text/plain;charset=utf-8"},
+    body:JSON.stringify(payload)
+  });
+
+  msg("mainMsg","ส่งคำสั่งลบแบบทดสอบแล้ว กรุณารอสักครู่");
+  setTimeout(loadAdminData,1800);
 }
 
 function addQuestion(){
